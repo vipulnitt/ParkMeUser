@@ -46,8 +46,8 @@
 
     <RadioGroup
         android:id="@+id/radioGroup"
-        android:layout_width="139dp"
-        android:layout_height="245dp"
+        android:layout_width="174dp"
+        android:layout_height="256dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.402"
@@ -58,7 +58,7 @@
         <RadioButton
             android:id="@+id/fourRadio"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="88dp"
             android:text="FourWheeler" />
 
         <TextView
@@ -66,11 +66,26 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Available :" />
+       <LinearLayout
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:orientation="horizontal">
+           <TextView
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text="Price(per Vehicle):Rs" />
+           <TextView
+               android:id="@+id/fourPrice"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text="0" />
+       </LinearLayout>
+
 
         <RadioButton
             android:id="@+id/twoRadio"
             android:layout_width="match_parent"
-            android:layout_height="96dp"
+            android:layout_height="78dp"
             android:text="Two Wheeler" />
 
         <TextView
@@ -78,6 +93,22 @@
             android:layout_width="match_parent"
             android:layout_height="29dp"
             android:text="Available :" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Price(per Vehicle):Rs" />
+            <TextView
+                android:id="@+id/twoPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0" />
+        </LinearLayout>
+
     </RadioGroup>
 
     <Button

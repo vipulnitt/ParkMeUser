@@ -1,7 +1,10 @@
 package com.example.parkmeuser;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +22,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class MyAdapter extends RecyclerView.Adapter <MyAdapter.MyViewHolder>{
@@ -42,11 +47,70 @@ public class MyAdapter extends RecyclerView.Adapter <MyAdapter.MyViewHolder>{
         holder.vehicle.setText(model.getVehicle());
         holder.pmode.setText(model.getPayment());
         holder.status.setText(model.getBookingStatus());
-        holder.datetime.setText(model.getDateTime());
+        SimpleDateFormat sfd = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+        holder.datetime.setText(sfd.format(new Date(Long.parseLong(model.getDateTime()))));
         holder.id.setText(model.getId());
+        holder.otp.setText(model.getOtp());
         if (holder.status.getText().equals("Confirmed")) {
             holder.status.setTextColor(Color.rgb(0, 153, 0));
         }
+
+        if(model.getBookingStatus().equals("Canceled"))
+        {
+            Log.d("vipulxx",model.getBookingStatus());
+            holder.cancelbtn.setVisibility(View.GONE);
+        }
+
+        if(model.getBookingStatus().equals("CheckedOut"))
+        {
+            holder.cancelbtn.setText("Details");
+            holder.cancelbtn.setBackgroundColor(Color.rgb(246,190,0));;
+            holder.cancelbtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    Intent intent = new Intent(context,BillPayment.class);
+                    intent.putExtra("Id",model.getId());
+                    context.startActivity(intent);
+                }
+            });
+        }
+        String[] lat=new String[1];
+        String[] lon=new String[1];
+        DatabaseReference db = FirebaseDatabase.getInstance().getReference("Booking").child(holder.id.getText().toString());
+        db.child("OwnerId").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                DatabaseReference dc = FirebaseDatabase.getInstance().getReference(snapshot.getValue().toString());
+                dc.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        lat[0]= snapshot.child("Latitude").getValue().toString();
+                        lon[0] = snapshot.child("Longitude").getValue().toString();
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        holder.trackLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String geoUri = "http://maps.google.com/maps?q=loc:" + lat[0] + "," + lon[0] + " (" + "Parking" + ")";
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(geoUri));
+                context.startActivity(intent);
+            }
+        });
     }
     @Override
     public int getItemCount() {
@@ -54,8 +118,8 @@ public class MyAdapter extends RecyclerView.Adapter <MyAdapter.MyViewHolder>{
     }
 
     public static  class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        TextView vehicle,datetime,status,pmode,id;
-        Button cancelbtn;
+        TextView vehicle,datetime,status,pmode,id,otp;
+        Button cancelbtn,trackLocation;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             vehicle= itemView.findViewById(R.id.vehicle);
@@ -63,7 +127,11 @@ public class MyAdapter extends RecyclerView.Adapter <MyAdapter.MyViewHolder>{
             status =itemView.findViewById(R.id.status);
             pmode = itemView.findViewById(R.id.paymentMode);
             id = itemView.findViewById(R.id.bookingId);
+            otp =itemView.findViewById(R.id.otp);
             cancelbtn =itemView.findViewById(R.id.cancel);
+            trackLocation = itemView.findViewById(R.id.trackLocation);
+            trackLocation.setTag("40");
+            trackLocation.setOnClickListener(this);
             cancelbtn.setTag(10);
             cancelbtn.setBackgroundColor(Color.rgb(237,0,8));
             cancelbtn.setOnClickListener(this);
@@ -71,7 +139,9 @@ public class MyAdapter extends RecyclerView.Adapter <MyAdapter.MyViewHolder>{
 
         @Override
         public void onClick(View view) {
-            if(view.getId()==cancelbtn.getId())
+
+
+            if(view.getId()==cancelbtn.getId()&&cancelbtn.getText().toString().equals("CANCEL"))
             {
                 Log.d("vipulx",cancelbtn.getText().toString());
 
@@ -83,7 +153,7 @@ public class MyAdapter extends RecyclerView.Adapter <MyAdapter.MyViewHolder>{
                      db.child("OwnerId").addValueEventListener(new ValueEventListener() {
                          @Override
                          public void onDataChange(@NonNull DataSnapshot snapshot) {
-                             DatabaseReference dbs = FirebaseDatabase.getInstance().getReference("Owners").child(snapshot.getValue().toString());
+                             DatabaseReference dbs = FirebaseDatabase.getInstance().getReference(snapshot.getValue().toString());
                              boolean[] ck = {false};
                              if (vehicle.getText().equals("Two Wheeler")) {
                                  dbs.child("Slots").child("Two").addValueEventListener(new ValueEventListener() {
@@ -107,9 +177,9 @@ public class MyAdapter extends RecyclerView.Adapter <MyAdapter.MyViewHolder>{
                              }
                              boolean[] lk={false};
                              Log.d("vipulxx",vehicle.getText().toString());
-                             DatabaseReference dbf = FirebaseDatabase.getInstance().getReference("Owners").child(snapshot.getValue().toString());
+                             DatabaseReference dbf = FirebaseDatabase.getInstance().getReference(snapshot.getValue().toString());
                              if (vehicle.getText().equals("FourWheeler")) {
-                                 Log.d("vipulxx","changed");
+
                                  dbf.child("Slots").child("Four").addValueEventListener(new ValueEventListener() {
                                      @Override
                                      public void onDataChange(@NonNull DataSnapshot snapshot) {

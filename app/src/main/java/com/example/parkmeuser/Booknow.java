@@ -22,16 +22,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Random;
+
 public class Booknow extends AppCompatActivity {
     private TextView details;
     private RadioGroup group,paymentgroup;
+    RadioButton radioTwo,radioFour;
     Button book;
     TextView fourView,twoView;
+    TextView twoPrice,fourPrice;
     String counter="0";
     String userid;
+    String parkingOwner;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        String parkingOwner;
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_booknow);
         details = findViewById(R.id.details);
@@ -40,8 +45,12 @@ public class Booknow extends AppCompatActivity {
         book = findViewById(R.id.bookNow);
         fourView = findViewById(R.id.textView);
         twoView = findViewById(R.id.textView3);
+        twoPrice = findViewById(R.id.twoPrice);
+        fourPrice = findViewById(R.id.fourPrice);
+         radioTwo =findViewById(R.id.twoRadio);
+         radioFour = findViewById(R.id.fourRadio);
         parkingOwner=getIntent().getExtras().getString("ownerid");
-        DatabaseReference db = FirebaseDatabase.getInstance().getReference("Owners").child(parkingOwner);
+        DatabaseReference db = FirebaseDatabase.getInstance().getReference(parkingOwner);
         userid = FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
         DatabaseReference cdb =FirebaseDatabase.getInstance().getReference("counter");
         cdb.addValueEventListener(new ValueEventListener() {
@@ -65,9 +74,21 @@ public class Booknow extends AppCompatActivity {
                String address=snapshot.child("address").getValue().toString();
                 String two=snapshot.child("Slots").child("Two").getValue().toString();
                 String four=snapshot.child("Slots").child("Four").getValue().toString();
+                String twop=snapshot.child("Price").child("two").getValue().toString();
+                String fourp = snapshot.child("Price").child("four").getValue().toString();
                 details.setText("Parking Name: "+pname+"\nAddress: "+address);
                 fourView.setText("Available: "+four);
                 twoView.setText("Available: "+two);
+                twoPrice.setText(twop);
+                fourPrice.setText(fourp);
+                if(Integer.parseInt(two)<=0)
+                {
+                    radioTwo.setEnabled(false);
+                }
+                if(Integer.parseInt(four)<=0)
+                {
+                    radioFour.setEnabled(false);
+                }
 
             }
 
@@ -89,8 +110,10 @@ public class Booknow extends AppCompatActivity {
                    Toast.makeText(getApplicationContext(),"Please Payment Mode!",Toast.LENGTH_SHORT).show();
                }else
                {
+
                    RadioButton btn= group.findViewById(selectedId);
                    RadioButton pay = paymentgroup.findViewById(paymentId);
+                   long otp=generatePin();
                    Log.d("vipulo",""+btn.getText().toString());
 
                    Log.d("vipulll",""+counter);
@@ -103,22 +126,31 @@ public class Booknow extends AppCompatActivity {
                    Log.d("vipulo",pay.getText().toString());
 
                    book.child(String.valueOf(c)).child("UserId").setValue(userid);
-                 java.util.Date date = new java.util.Date();
-                   book.child(String.valueOf(c)).child("DateTime").setValue(date.toString());
+
+                   book.child(String.valueOf(c)).child("DateTime").setValue(com.google.firebase.Timestamp.now().getSeconds()*1000);
                    book.child(String.valueOf(c)).child("Payment").setValue(pay.getText().toString());
                    book.child(String.valueOf(c)).child("Vehicle").setValue(btn.getText().toString());
                    book.child(String.valueOf(c)).child("BookingStatus").setValue("Pending");
                    book.child(String.valueOf(c)).child("OwnerId").setValue(parkingOwner);
-                   //Log.d("Vipulx",)
-                  DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Owners").child(parkingOwner);
-                   databaseReference.child("Booking").child(""+c).setValue(c);
+                   book.child(String.valueOf(c)).child("otp").setValue(String.valueOf(otp));
+                   if(btn.getText().toString().equals("FourWheeler"))
+                   book.child(String.valueOf(c)).child("Price").setValue(fourPrice.getText().toString());
+                   else
+                       book.child(String.valueOf(c)).child("Price").setValue(twoPrice.getText().toString());
+                 DatabaseReference d = FirebaseDatabase.getInstance().getReference();
+                   d.child("OwnerBooking").child(parkingOwner).child(""+c).setValue(c);
 
                   startActivity(new Intent(getApplicationContext(),CurrentBooking.class));
-
+                  finish();
 
                }
 
            }
        });
+    }
+    private static final Random generator = new Random();
+
+    public static long generatePin() {
+        return 100000 + generator.nextInt(900000);
     }
 }

@@ -1,7 +1,15 @@
 package com.example.parkmeuser;
 
 public class Model {
-    String Vehicle,Payment,DateTime,BookingStatus,id;
+    String Vehicle,Payment,DateTime,BookingStatus,id,otp;
+
+    public String getOtp() {
+        return otp;
+    }
+
+    public void setOtp(String otp) {
+        this.otp = otp;
+    }
 
     public String getId() {
         return id;

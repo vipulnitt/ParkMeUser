@@ -80,22 +80,22 @@ public class CurrentBooking extends AppCompatActivity {
                         if(index>=0)
                         {
                             Model model = new Model();
-                            if(!dataSnapshot.child("BookingStatus").getValue().toString().equals("Canceled"))
-                            {
 
-                                    model.setBookingStatus(dataSnapshot.child("BookingStatus").getValue().toString());
+                                model.setBookingStatus(dataSnapshot.child("BookingStatus").getValue().toString());
                                 model.setDateTime(dataSnapshot.child("DateTime").getValue().toString());
                                 model.setVehicle(dataSnapshot.child("Vehicle").getValue().toString());
                                 model.setPayment(dataSnapshot.child("Payment").getValue().toString());
+                                model.setOtp(dataSnapshot.child("otp").getValue().toString());
                                 model.setId(dataSnapshot.getKey().toString());
                                 mlist.add(model);
-                            }
+
 
                         }
                         //Log.d("viplulx",dataSnapshot.getKey());
 
 
                     }
+                    Collections.reverse(mlist);
                     adapter.notifyDataSetChanged();
 
                 }

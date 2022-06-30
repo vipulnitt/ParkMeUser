@@ -23,6 +23,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -103,10 +104,10 @@ public class baseActivity extends AppCompatActivity implements pop.popListner {
                 int id=item.getItemId();
                  if(id==R.id.home)
                  {
-                     //home
+                        drawerLayout.closeDrawer(Gravity.LEFT);
                  }
                 if(id==R.id.profile){
-                    //Profile
+                   startActivity(new Intent(getApplicationContext(),Profile.class));
                 }
                 if(id==R.id.preBooking)
                 {
@@ -288,7 +289,7 @@ public class baseActivity extends AppCompatActivity implements pop.popListner {
             SharedPreferences.Editor editor = pref.edit();
             editor.putString("user",user[0]);
             editor.apply();
-            DatabaseReference db = FirebaseDatabase.getInstance().getReference("Owners").child(user[0]);
+            DatabaseReference db = FirebaseDatabase.getInstance().getReference(user[0]);
 
             db.addValueEventListener(new ValueEventListener() {
                 @Override

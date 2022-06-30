@@ -10,7 +10,7 @@
     </item>
     <item
         android:id="@+id/preBooking"
-        android:title="Current Booking">
+        android:title="My Booking">
     </item>
     <item
         android:id="@+id/rate"

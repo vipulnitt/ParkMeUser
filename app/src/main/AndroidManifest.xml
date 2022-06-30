@@ -14,6 +14,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ParkMeUser">
         <activity
+            android:name=".Profile"
+            android:exported="false" />
+        <activity
+            android:name=".BillPayment"
+            android:exported="false" />
+        <activity
             android:name=".CurrentBooking"
             android:exported="false" />
         <activity
